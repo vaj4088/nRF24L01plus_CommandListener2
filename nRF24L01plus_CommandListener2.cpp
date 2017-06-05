@@ -23,8 +23,8 @@
 // Uncomment for Serial debug message.
 // #define RC_DEBUG
 
-const unsigned long version = 20170603 ;
-const char versionSuffix = 'd' ;
+const unsigned long version = 20170605 ;
+const char versionSuffix = 'a' ;
 
 RF24 myRF24(8, 10);
 
@@ -137,6 +137,7 @@ void setup() {
 
 	// Set up the reading pipe (and the unnecessary writing pipe).
 	setUpPipes();
+	myRF24.startListening() ;
 
 	screenUpdateTimer = millis() ;
 	runTimer = millis() ;
