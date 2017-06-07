@@ -18,12 +18,13 @@
 #include "nRF24L01plus_CommandListener2.h"
 
 #include "RF24.h"
+#include "printf.h"  	// Needed for the "printDetails()"
 
 // Comment to not get Serial debug message.
 // Uncomment for Serial debug message.
 // #define RC_DEBUG
 
-const unsigned long version = 20170605 ;
+const unsigned long version = 20170606 ;
 const char versionSuffix = 'a' ;
 
 RF24 myRF24(8, 10);
@@ -129,7 +130,10 @@ void localScreenSetup() {
 void setup() {
 	screenSetup(115200UL, localScreenSetup) ;
 
-	// init receiver buffer
+	// Needed for the "printDetails()"
+	printf_begin();
+
+// init receiver buffer
 	initBuffer();
 
 	// init transceiver
