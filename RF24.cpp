@@ -89,7 +89,8 @@ uint8_t RF24::read_register(uint8_t reg, uint8_t* buf, uint8_t len)
   uint8_t status;
 
   #if defined (RF24_LINUX)
-  beginTransaction(); //configures the spi settings for RPi, locks mutex and setting csn low
+  beginTransaction(); //configures the spi settings for RPi,
+                      //locks mutex and setting csn low
   uint8_t * prx = spi_rxbuff;
   uint8_t * ptx = spi_txbuff;
   uint8_t size = len + 1; // Add register value to transmit buffer
@@ -215,7 +216,9 @@ uint8_t RF24::write_register(uint8_t reg, uint8_t value)
 
 /****************************************************************************/
 
-uint8_t RF24::write_payload(const void* buf, uint8_t data_len, const uint8_t writeType)
+uint8_t RF24::write_payload(const void* buf,
+		uint8_t data_len,
+		const uint8_t writeType)
 {
   uint8_t status;
   const uint8_t* current = reinterpret_cast<const uint8_t*>(buf);
@@ -224,7 +227,8 @@ uint8_t RF24::write_payload(const void* buf, uint8_t data_len, const uint8_t wri
    uint8_t blank_len = dynamic_payloads_enabled ? 0 : payload_size - data_len;
   
   //printf("[Writing %u bytes %u blanks]",data_len,blank_len);
-  IF_SERIAL_DEBUG( printf("[Writing %u bytes %u blanks]\n",data_len,blank_len); );
+  IF_SERIAL_DEBUG(
+		  printf("[Writing %u bytes %u blanks]\n",data_len,blank_len); );
   
  #if defined (RF24_LINUX)
 	beginTransaction();
@@ -272,7 +276,8 @@ uint8_t RF24::read_payload(void* buf, uint8_t data_len)
   
   //printf("[Reading %u bytes %u blanks]",data_len,blank_len);
 
-  IF_SERIAL_DEBUG( printf("[Reading %u bytes %u blanks]\n",data_len,blank_len); );
+  IF_SERIAL_DEBUG(
+		  printf("[Reading %u bytes %u blanks]\n",data_len,blank_len); );
   
   #if defined (RF24_LINUX)
 	beginTransaction();
@@ -353,7 +358,8 @@ uint8_t RF24::get_status(void)
 #if !defined (MINIMAL)
 void RF24::print_status(uint8_t status)
 {
-  printf_P(PSTR("STATUS\t\t = 0x%02x RX_DR=%x TX_DS=%x MAX_RT=%x RX_P_NO=%x TX_FULL=%x\r\n"),
+  printf_P(PSTR(
+  "STATUS\t\t = 0x%02x RX_DR=%x TX_DS=%x MAX_RT=%x RX_P_NO=%x TX_FULL=%x\r\n"),
            status,
            (status & _BV(RX_DR))?1:0,
            (status & _BV(TX_DS))?1:0,
@@ -418,7 +424,8 @@ void RF24::print_address_register(const char* name, uint8_t reg, uint8_t qty)
 
 RF24::RF24(uint16_t _cepin, uint16_t _cspin):
   ce_pin(_cepin), csn_pin(_cspin), p_variant(false),
-  payload_size(32), dynamic_payloads_enabled(false), addr_width(5),csDelay(5)//,pipe0_reading_address(0)
+  payload_size(32), dynamic_payloads_enabled(false), addr_width(5),csDelay(5)
+//,pipe0_reading_address(0)
 {
   pipe0_reading_address[0]=0;
   txDelay = 250 ;       // IBS Ian Shef  12 Apr 2017 to eliminate a bug warning.
@@ -431,7 +438,9 @@ RF24::RF24(uint16_t _cepin, uint16_t _cspin):
 #if defined (RF24_LINUX) && !defined (MRAA)//RPi constructor
 
 RF24::RF24(uint16_t _cepin, uint16_t _cspin, uint32_t _spi_speed):
-  ce_pin(_cepin),csn_pin(_cspin),spi_speed(_spi_speed),p_variant(false), payload_size(32), dynamic_payloads_enabled(false),addr_width(5)//,pipe0_reading_address(0) 
+  ce_pin(_cepin),csn_pin(_cspin),spi_speed(_spi_speed),p_variant(false),
+  payload_size(32), dynamic_payloads_enabled(false),addr_width(5)
+//,pipe0_reading_address(0)
 {
   pipe0_reading_address[0]=0;
 }
@@ -555,7 +564,11 @@ void RF24::printDetails(void)
   print_byte_register(PSTR("RX_ADDR_P2-5"),RX_ADDR_P2,4);
   print_address_register(PSTR("TX_ADDR\t"),TX_ADDR);
 
-  print_byte_register(PSTR("RX_PW_P0-6"),RX_PW_P0,6);
+  //
+  //  IBS  Ian Shef  7 June 2017  Changed 6 to 5 in following line.
+  //  Line was:  print_byte_register(PSTR("RX_PW_P0-6"),RX_PW_P0,6);
+  //
+  print_byte_register(PSTR("RX_PW_P0-5"),RX_PW_P0,6);
   print_byte_register(PSTR("EN_AA\t"),EN_AA);
   print_byte_register(PSTR("EN_RXADDR"),EN_RXADDR);
   print_byte_register(PSTR("RF_CH\t"),RF_CH);
@@ -563,10 +576,14 @@ void RF24::printDetails(void)
   print_byte_register(PSTR("CONFIG\t"),NRF_CONFIG);
   print_byte_register(PSTR("DYNPD/FEATURE"),DYNPD,2);
 
-  printf_P(PSTR("Data Rate\t = " PRIPSTR "\r\n"),pgm_read_word(&rf24_datarate_e_str_P[getDataRate()]));
-  printf_P(PSTR("Model\t\t = " PRIPSTR "\r\n"),pgm_read_word(&rf24_model_e_str_P[isPVariant()]));
-  printf_P(PSTR("CRC Length\t = " PRIPSTR "\r\n"),pgm_read_word(&rf24_crclength_e_str_P[getCRCLength()]));
-  printf_P(PSTR("PA Power\t = " PRIPSTR "\r\n"),  pgm_read_word(&rf24_pa_dbm_e_str_P[getPALevel()]));
+  printf_P(PSTR("Data Rate\t = " PRIPSTR "\r\n"),
+		  pgm_read_word(&rf24_datarate_e_str_P[getDataRate()]));
+  printf_P(PSTR("Model\t\t = " PRIPSTR "\r\n"),
+		  pgm_read_word(&rf24_model_e_str_P[isPVariant()]));
+  printf_P(PSTR("CRC Length\t = " PRIPSTR "\r\n"),
+		  pgm_read_word(&rf24_crclength_e_str_P[getCRCLength()]));
+  printf_P(PSTR("PA Power\t = " PRIPSTR "\r\n"),
+		  pgm_read_word(&rf24_pa_dbm_e_str_P[getPALevel()]));
 
 }
 
@@ -630,20 +647,29 @@ bool RF24::begin(void)
   	#endif
   #endif //Linux
 
-  // Must allow the radio time to settle else configuration bits will not necessarily stick.
-  // This is actually only required following power up but some settling time also appears to
-  // be required after resets too. For full coverage, we'll always assume the worst.
-  // Enabling 16b CRC is by far the most obvious case if the wrong timing is used - or skipped.
-  // Technically we require 4.5ms + 14us as a worst case. We'll just call it 5ms for good measure.
-  // WARNING: Delay is based on P-variant whereby non-P *may* require different timing.
+  // Must allow the radio time to settle else configuration bits will not
+  // necessarily stick.
+  // This is actually only required following power up but some settling time
+  // also appears to
+  // be required after resets too.
+  // For full coverage, we'll always assume the worst.
+  // Enabling 16b CRC is by far the most obvious case
+  // if the wrong timing is used - or skipped.
+  // Technically we require 4.5ms + 14us as a worst case.
+  // We'll just call it 5ms for good measure.
+  // WARNING: Delay is based on P-variant whereby
+  // non-P *may* require different timing.
   delay( 5 ) ;
 
   // Reset NRF_CONFIG and enable 16-bit CRC.
   write_register( NRF_CONFIG, 0x0C ) ;
 
-  // Set 1500uS (minimum for 32B payload in ESB@250KBPS) timeouts, to make testing a little easier
-  // WARNING: If this is ever lowered, either 250KBS mode with AA is broken or maximum packet
-  // sizes must never be used. See documentation for a more complete explanation.
+  // Set 1500uS (minimum for 32B payload in ESB@250KBPS) timeouts,
+  // to make testing a little easier
+  // WARNING: If this is ever lowered, either 250KBS mode with AA is broken or
+  // maximum packet
+  // sizes must never be used.
+  // See documentation for a more complete explanation.
   setRetries(5,15);
 
   // Reset value is MAX
@@ -661,14 +687,16 @@ bool RF24::begin(void)
     p_variant = true ;
   }*/
   
-  // Then set the data rate to the slowest (and most reliable) speed supported by all
+  // Then set the data rate to the slowest (and most reliable) speed
+  // supported by all
   // hardware.
   setDataRate( RF24_1MBPS ) ;
 
   // Initialize CRC and request 2-byte (16bit) CRC
   //setCRCLength( RF24_CRC_16 ) ;
 
-  // Disable dynamic payloads, to match dynamic_payloads_enabled setting - Reset value is 0
+  // Disable dynamic payloads, to match dynamic_payloads_enabled
+  // setting - Reset value is 0
   toggle_features();
   write_register(FEATURE,0 );
   write_register(DYNPD,0);
@@ -689,7 +717,8 @@ bool RF24::begin(void)
 
   powerUp(); //Power up by default when begin() is called
 
-  // Enable PTX, do not write CE high so radio will remain in standby I mode ( 130us max to transition to RX or TX instead of 1500us from powerUp )
+  // Enable PTX, do not write CE high so radio will remain in standby I mode
+  // ( 130us max to transition to RX or TX instead of 1500us from powerUp )
   // PTX should use only 22uA of power
   write_register(NRF_CONFIG, ( read_register(NRF_CONFIG) ) & ~_BV(PRIM_RX) );
 
@@ -750,7 +779,8 @@ void RF24::stopListening(void)
 	powerUp();
   }
   #endif
-  write_register(EN_RXADDR,read_register(EN_RXADDR) | _BV(pgm_read_byte(&child_pipe_enable[0]))); // Enable RX on pipe0
+  write_register(EN_RXADDR,read_register(EN_RXADDR) |
+		  _BV(pgm_read_byte(&child_pipe_enable[0]))); // Enable RX on pipe0
   
   //delayMicroseconds(100);
 
@@ -766,7 +796,8 @@ void RF24::powerDown(void)
 
 /****************************************************************************/
 
-//Power up now. Radio will not power down unless instructed by MCU for config changes etc.
+//Power up now. Radio will not power down unless instructed
+//by MCU for config changes etc.
 void RF24::powerUp(void)
 {
    uint8_t cfg = read_register(NRF_CONFIG);
@@ -775,8 +806,10 @@ void RF24::powerUp(void)
    if (!(cfg & _BV(PWR_UP))){
       write_register(NRF_CONFIG, cfg | _BV(PWR_UP));
 
-      // For nRF24L01+ to go from power down mode to TX or RX mode it must first pass through stand-by mode.
-	  // There must be a delay of Tpd2stby (see Table 16.) after the nRF24L01+ leaves power down mode before
+      // For nRF24L01+ to go from power down mode to TX or RX mode
+      // it must first pass through stand-by mode.
+	  // There must be a delay of Tpd2stby (see Table 16.) after
+      // the nRF24L01+ leaves power down mode before
 	  // the CEis set high. - Tpd2stby can be up to 5ms per the 1.0 datasheet
       delay(5);
    }
@@ -827,7 +860,8 @@ bool RF24::write( const void* buf, uint8_t len, const bool multicast )
 
   //Max retries exceeded
   if( status & _BV(MAX_RT)){
-  	flush_tx(); //Only going to be 1 packet int the FIFO at a time using this method, so just flush
+  	flush_tx(); //Only going to be 1 packet in the FIFO at a time
+  	            //using this method, so just flush
   	return 0;
   }
 	//TX OK 1 or 0
@@ -845,15 +879,22 @@ bool RF24::writeBlocking( const void* buf, uint8_t len, uint32_t timeout )
 	//Block until the FIFO is NOT full.
 	//Keep track of the MAX retries and set auto-retry if seeing failures
 	//This way the FIFO will fill up and allow blocking until packets go through
-	//The radio will auto-clear everything in the FIFO as long as CE remains high
+	//The radio will auto-clear everything in the FIFO as
+	//long as CE remains high
 
-	uint32_t timer = millis();							  //Get the time that the payload transmission started
+	//Get the time that the payload transmission started
+	uint32_t timer = millis();
 
-	while( ( get_status()  & ( _BV(TX_FULL) ))) {		  //Blocking only if FIFO is full. This will loop and block until TX is successful or timeout
+	//Blocking only if FIFO is full. This will loop and
+	//block until TX is successful or timeout
+	while( ( get_status()  & ( _BV(TX_FULL) ))) {
 
-		if( get_status() & _BV(MAX_RT)){					  //If MAX Retries have been reached
-			reUseTX();										  //Set re-transmit and clear the MAX_RT interrupt flag
-			if(millis() - timer > timeout){ return 0; }		  //If this payload has exceeded the user-defined timeout, exit and return 0
+		if( get_status() & _BV(MAX_RT)){	 //If MAX Retries have been reached
+			reUseTX();			             //Set re-transmit and clear
+			                                 //the MAX_RT interrupt flag
+			//If this payload has exceeded the user-defined timeout,
+			//exit and return 0
+			if(millis() - timer > timeout){ return 0; }
 		}
 		#if defined (FAILURE_HANDLING) || defined (RF24_LINUX)
 			if(millis() - timer > (timeout+95) ){			
@@ -867,17 +908,17 @@ bool RF24::writeBlocking( const void* buf, uint8_t len, uint32_t timeout )
   	}
 
   	//Start Writing
-	startFastWrite(buf,len,0);								  //Write the payload if a buffer is clear
+	startFastWrite(buf,len,0);	//Write the payload if a buffer is clear
 
-	return 1;												  //Return 1 to indicate successful transmission
+	return 1;					//Return 1 to indicate successful transmission
 }
 
 /****************************************************************************/
 
 void RF24::reUseTX(){
-		write_register(NRF_STATUS,_BV(MAX_RT) );			  //Clear max retry flag
+		write_register(NRF_STATUS,_BV(MAX_RT) );		//Clear max retry flag
 		spiTrans( REUSE_TX_PL );
-		ce(LOW);										  //Re-Transfer packet
+		ce(LOW);										//Re-Transfer packet
 		ce(HIGH);
 }
 
@@ -887,20 +928,29 @@ bool RF24::writeFast( const void* buf, uint8_t len, const bool multicast )
 {
 	//Block until the FIFO is NOT full.
 	//Keep track of the MAX retries and set auto-retry if seeing failures
-	//Return 0 so the user can control the retrys and set a timer or failure counter if required
-	//The radio will auto-clear everything in the FIFO as long as CE remains high
+	//Return 0 so the user can control the retrys and
+	//set a timer or failure counter if required
+	//The radio will auto-clear everything in the FIFO as long as
+	//CE remains high
 
 	#if defined (FAILURE_HANDLING) || defined (RF24_LINUX)
 		uint32_t timer = millis();
 	#endif
 	
-	while( ( get_status()  & ( _BV(TX_FULL) ))) {			  //Blocking only if FIFO is full. This will loop and block until TX is successful or fail
+		//Blocking only if FIFO is full. This will loop and block until
+		//TX is successful or fail
+		while( ( get_status()  & ( _BV(TX_FULL) ))) {
 
 		if( get_status() & _BV(MAX_RT)){
-			//reUseTX();										  //Set re-transmit
-			write_register(NRF_STATUS,_BV(MAX_RT) );			  //Clear max retry flag
-			return 0;										  //Return 0. The previous payload has been retransmitted
-															  //From the user perspective, if you get a 0, just keep trying to send the same payload
+			//reUseTX();									//Set re-transmit
+			write_register(NRF_STATUS,_BV(MAX_RT) );		//Clear max retry
+			                                                //flag
+			return 0;										//Return 0.
+			                                                //The previous
+			                                                //payload has been
+			                                                //retransmitted
+		//From the user perspective, if you get a 0, just keep
+		//trying to send the same payload
 		}
 		#if defined (FAILURE_HANDLING) || defined (RF24_LINUX)
 			if(millis() - timer > 95 ){			
@@ -923,12 +973,17 @@ bool RF24::writeFast( const void* buf, uint8_t len ){
 
 /****************************************************************************/
 
-//Per the documentation, we want to set PTX Mode when not listening. Then all we do is write data and set CE high
-//In this mode, if we can keep the FIFO buffers loaded, packets will transmit immediately (no 130us delay)
+//Per the documentation, we want to set PTX Mode when not listening.
+//Then all we do is write data and set CE high
+//In this mode, if we can keep the FIFO buffers loaded, packets will transmit
+//immediately (no 130us delay)
 //Otherwise we enter Standby-II mode, which is still faster than standby mode
-//Also, we remove the need to keep writing the config register over and over and delaying for 150 us each time if sending a stream of data
+//Also, we remove the need to keep writing the config register over and over
+//and delaying for 150 us each time if sending a stream of data
 
-void RF24::startFastWrite( const void* buf, uint8_t len, const bool multicast, bool startTx){ //TMRh20
+void RF24::startFastWrite( const void* buf, uint8_t len,
+		const bool multicast,
+		bool startTx){ //TMRh20
 
 	//write_payload( buf,len);
 	write_payload( buf, len,multicast ? W_TX_PAYLOAD_NO_ACK : W_TX_PAYLOAD ) ;
@@ -940,7 +995,8 @@ void RF24::startFastWrite( const void* buf, uint8_t len, const bool multicast, b
 
 /****************************************************************************/
 
-//Added the original startWrite back in so users can still use interrupts, ack payloads, etc
+//Added the original startWrite back in so users can still use
+//interrupts, ack payloads, etc
 //Allows the library to pass all tests
 void RF24::startWrite( const void* buf, uint8_t len, const bool multicast ){
 
@@ -1003,7 +1059,7 @@ bool RF24::txStandBy(uint32_t timeout, bool startTx){
 	while( ! (read_register(FIFO_STATUS) & _BV(TX_EMPTY)) ){
 		if( get_status() & _BV(MAX_RT)){
 			write_register(NRF_STATUS,_BV(MAX_RT) );
-				ce(LOW);										  //Set re-transmit
+				ce(LOW);									 //Set re-transmit
 				ce(HIGH);
 				if(millis() - start >= timeout){
 					ce(LOW); flush_tx(); return 0;
@@ -1106,7 +1162,9 @@ void RF24::whatHappened(bool& tx_ok,bool& tx_fail,bool& rx_ready)
 {
   // Read the status & reset the status in one easy call
   // Or is that such a good idea?
-  uint8_t status = write_register(NRF_STATUS,_BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
+  uint8_t status = write_register(NRF_STATUS,_BV(RX_DR) |
+		  _BV(TX_DS) |
+		  _BV(MAX_RT) );
 
   // Report to the user what happened
   tx_ok = status & _BV(TX_DS);
@@ -1164,20 +1222,27 @@ void RF24::openReadingPipe(uint8_t child, uint64_t address)
     memcpy(pipe0_reading_address,&address,addr_width);
   }
 
-  if (child <= 6)
+  //
+  //  IBS  Ian Shef  7 June 2017  Changed 6 to 5 in following line.
+  //  Line was:  if (child <= 6)
+  //
+  if (child <= 5)
   {
     // For pipes 2-5, only write the LSB
     if ( child < 2 )
-      write_register(pgm_read_byte(&child_pipe[child]), reinterpret_cast<const uint8_t*>(&address), addr_width);
+      write_register(pgm_read_byte(&child_pipe[child]),
+    		  reinterpret_cast<const uint8_t*>(&address), addr_width);
     else
-      write_register(pgm_read_byte(&child_pipe[child]), reinterpret_cast<const uint8_t*>(&address), 1);
+      write_register(pgm_read_byte(&child_pipe[child]),
+    		  reinterpret_cast<const uint8_t*>(&address), 1);
 
     write_register(pgm_read_byte(&child_payload_size[child]),payload_size);
 
     // Note it would be more efficient to set all of the bits for all open
     // pipes at once.  However, I thought it would make the calling code
     // more simple to do it this way.
-    write_register(EN_RXADDR,read_register(EN_RXADDR) | _BV(pgm_read_byte(&child_pipe_enable[child])));
+    write_register(EN_RXADDR,read_register(EN_RXADDR) |
+    		_BV(pgm_read_byte(&child_pipe_enable[child])));
   }
 }
 
@@ -1204,7 +1269,11 @@ void RF24::openReadingPipe(uint8_t child, const uint8_t *address)
   if (child == 0){
     memcpy(pipe0_reading_address,address,addr_width);
   }
-  if (child <= 6)
+  //
+  //  IBS  Ian Shef  7 June 2017  Changed 6 to 5 in following line.
+  //  Line was:  if (child <= 6)
+  //
+  if (child <= 5)
   {
     // For pipes 2-5, only write the LSB
     if ( child < 2 ){
@@ -1217,7 +1286,8 @@ void RF24::openReadingPipe(uint8_t child, const uint8_t *address)
     // Note it would be more efficient to set all of the bits for all open
     // pipes at once.  However, I thought it would make the calling code
     // more simple to do it this way.
-    write_register(EN_RXADDR,read_register(EN_RXADDR) | _BV(pgm_read_byte(&child_pipe_enable[child])));
+    write_register(EN_RXADDR,read_register(EN_RXADDR) |
+    		_BV(pgm_read_byte(&child_pipe_enable[child])));
 
   }
 }
@@ -1226,7 +1296,8 @@ void RF24::openReadingPipe(uint8_t child, const uint8_t *address)
 
 void RF24::closeReadingPipe( uint8_t pipe )
 {
-  write_register(EN_RXADDR,read_register(EN_RXADDR) & ~_BV(pgm_read_byte(&child_pipe_enable[pipe])));
+  write_register(EN_RXADDR,read_register(EN_RXADDR) &
+		  ~_BV(pgm_read_byte(&child_pipe_enable[pipe])));
 }
 
 /****************************************************************************/
@@ -1255,7 +1326,13 @@ void RF24::enableDynamicPayloads(void)
   //
   // Not sure the use case of only having dynamic payload on certain
   // pipes, so the library does not support it.
-  write_register(DYNPD,read_register(DYNPD) | _BV(DPL_P5) | _BV(DPL_P4) | _BV(DPL_P3) | _BV(DPL_P2) | _BV(DPL_P1) | _BV(DPL_P0));
+  write_register(DYNPD,read_register(DYNPD) |
+		  _BV(DPL_P5) |
+		  _BV(DPL_P4) |
+		  _BV(DPL_P3) |
+		  _BV(DPL_P2) |
+		  _BV(DPL_P1) |
+		  _BV(DPL_P0));
 
   dynamic_payloads_enabled = true;
 }
@@ -1266,7 +1343,8 @@ void RF24::disableDynamicPayloads(void)
   // Disables dynamic payload throughout the system.  Also disables Ack Payloads
 
   //toggle_features();
-  write_register(FEATURE,read_register(FEATURE) & ~(_BV(EN_DPL) | _BV(EN_ACK_PAY)));
+  write_register(FEATURE,read_register(FEATURE) &
+		  ~(_BV(EN_DPL) | _BV(EN_ACK_PAY)));
 
 
   IF_SERIAL_DEBUG(printf("FEATURE=%i\r\n",read_register(FEATURE)));
@@ -1275,7 +1353,13 @@ void RF24::disableDynamicPayloads(void)
   //
   // Not sure the use case of only having dynamic payload on certain
   // pipes, so the library does not support it.
-  write_register(DYNPD,read_register(DYNPD) & ~( _BV(DPL_P5) | _BV(DPL_P4) | _BV(DPL_P3) | _BV(DPL_P2) | _BV(DPL_P1) | _BV(DPL_P0)));
+  write_register(DYNPD,read_register(DYNPD) & ~(
+		  _BV(DPL_P5) |
+		  _BV(DPL_P4) |
+		  _BV(DPL_P3) |
+		  _BV(DPL_P2) |
+		  _BV(DPL_P1) |
+		  _BV(DPL_P0)));
 
   dynamic_payloads_enabled = false;
 }
@@ -1289,7 +1373,8 @@ void RF24::enableAckPayload(void)
   //
 
     //toggle_features();
-    write_register(FEATURE,read_register(FEATURE) | _BV(EN_ACK_PAY) | _BV(EN_DPL) );
+    write_register(FEATURE,read_register(FEATURE) |
+    		_BV(EN_ACK_PAY) | _BV(EN_DPL) );
 
   IF_SERIAL_DEBUG(printf("FEATURE=%i\r\n",read_register(FEATURE)));
 
@@ -1374,6 +1459,10 @@ void RF24::setAutoAck(bool enable)
 
 void RF24::setAutoAck( uint8_t pipe, bool enable )
 {
+	  //
+	  //  IBS  Ian Shef  7 June 2017  Changed 6 to 5 in following line.
+	  //  Line was:  if ( pipe <= 6 )
+	  //
   if ( pipe <= 6 )
   {
     uint8_t en_aa = read_register( EN_AA ) ;
@@ -1411,7 +1500,8 @@ void RF24::setPALevel(uint8_t level)
   uint8_t setup = read_register(RF_SETUP) & 0xF8;
 
   if(level > 3){  						// If invalid level, go to max PA
-	  level = (RF24_PA_MAX << 1) + 1;		// +1 to support the SI24R1 chip extra bit
+	  level = (RF24_PA_MAX << 1) + 1;		// +1 to support the
+                                            //	  SI24R1 chip extra bit
   }else{
 	  level = (level << 1) + 1;	 		// Else set level as requested
   }
